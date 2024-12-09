@@ -5,7 +5,7 @@
                 <div class="storage">
                     <div class="d-flex mb-2">
                         <div>Storage</div>
-                        <div class="ms-auto"><a href="#"><u>Change plan</u></a></div>
+                        <div class="ms-auto text-muted"><a href="#" class="text-reset">Change plan</a></div>
                     </div>
                     <div>
                         <input type="range" :value="usagePercentage" max="100" disabled class="w-100" id="range" />
@@ -26,22 +26,22 @@
                 <div class="folders w-100">
                     <div class="d-flex mb-2">
                         <div>Folders</div>
-                        <div class="ms-auto"><a href="#"><u>New Folder</u></a></div>
+                        <div class="ms-auto text-muted"><a href="#" class="text-reset">New Folder</a></div>
                     </div>
                     <div class="folder-tree">
-                        <FolderTree :nodes="this.folders" @folder-clicked="handleFolderClick" />
+                        <FolderTree :nodes="this.folders" @folder-clicked="handleFolderClick" :selectedFolder="selectedFolder" />
                     </div>
                 </div>
                 <hr>
                 <div class="members">
                     <div class="d-flex mb-2">
                         <div>Members</div>
-                        <div class="ms-auto"><a href="#"><u>Select All</u></a></div>
+                        <div class="ms-auto text-muted"><a href="#" class="text-reset">Select all</a></div>
                     </div>
                     <ul class="ps-0">
                         <li v-for="member in members" :key="member" class="text-start ps-0">
                             <label>
-                                <input type="radio" v-model="selectedMember" :value="member" />
+                                <input type="checkbox" v-model="selectedMember" :value="member" />
                                 {{ member }}
                             </label>
                         </li>
@@ -94,7 +94,7 @@ export default {
             folders: [],
             members: ["All", "Admin", "Apple"],
             selectedFolder: 1,
-            selectedMember: "All",
+            selectedMember: ["All"],
             searchQuery: "",
         }
     },
@@ -103,18 +103,15 @@ export default {
             return this.selectedItems.length === this.items.length;
         },
         filteredItems() {
-            console.log(this.selectedFolder);
-
             const currentFolder = this.findFolderById(this.folders, this.selectedFolder);
-            console.log(currentFolder);
 
             if (!currentFolder) return [];
 
             let items = this.getAllFiles(currentFolder);
 
-            if (this.selectedMember != "All") {
+            if (!this.selectedMember.includes("All")) {
                 items = items.filter((item) =>
-                    item.photo_by && item.photo_by == this.selectedMember
+                    item.photo_by && this.selectedMember.includes(item.photo_by)
                 );
             }
 
@@ -350,6 +347,7 @@ export default {
     margin: 0;
 }
 
+
 ul {
     list-style: none;
     padding: 0;
@@ -357,7 +355,7 @@ ul {
 
 ul li {
     cursor: pointer;
-    margin: 0.5rem 0;
+    /* margin: 0.5rem 0; */
 }
 
 ul li.active {
